@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/my3Navigation"
+    app:startDestination="@+id/my3Usage">
+
+    <fragment
+        android:id="@+id/my3Setup"
+        android:name="org.damienoreilly.threeutils.fragment.My3SetupFragment"
+        android:label="fragment_my3_setup"
+        tools:layout="@layout/fragment_my3_setup" >
+    </fragment>
+    <fragment
+        android:id="@+id/my3Usage"
+        android:name="org.damienoreilly.threeutils.fragment.My3Usage"
+        android:label="fragment_my3_usage"
+        tools:layout="@layout/fragment_my3_usage" >
+        <action android:id="@+id/action_my3Usage_to_my3Setup" app:destination="@id/my3Setup" />
+    </fragment>
+</navigation>
