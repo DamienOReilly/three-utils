@@ -49,9 +49,9 @@ class My3SetupViewModel (
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
-        val work = PeriodicWorkRequestBuilder<My3Worker>(1, TimeUnit.HOURS)
+        val work = PeriodicWorkRequestBuilder<My3Worker>(6, TimeUnit.HOURS)
                 .setConstraints(constraints)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 1, TimeUnit.HOURS)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.MINUTES)
                 .build()
 
         WorkManager.getInstance()

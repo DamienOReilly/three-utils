@@ -1,5 +1,6 @@
 package org.damienoreilly.threeutils.util
 
+import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -9,9 +10,9 @@ object Utils {
 
     internal val zoneId = ZoneId.of("Europe/Dublin")
 
-    fun parseDate(date: String): ZonedDateTime {
+    fun parseDate(date: String): ZonedDateTime? {
         return if (date == "In queue") {
-            ZonedDateTime.of(2050, 1, 1, 0, 0 ,0 , 0, zoneId)
+            null
         } else {
             val dateStr = date.replace("Expires", "").trim()
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yy")
@@ -21,5 +22,8 @@ object Utils {
         }
 
     }
+
+    fun getDelay(expireDate: ZonedDateTime, currentDate: ZonedDateTime, advancedNotice: Duration): Duration =
+            Duration.between(currentDate, expireDate.minus(advancedNotice))
 
 }

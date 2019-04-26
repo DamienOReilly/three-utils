@@ -2,22 +2,19 @@ package org.damienoreilly.threeutils.worker
 
 import android.content.Context
 import android.util.Log
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import io.karn.notify.Notify
+import androidx.work.*
 import kotlinx.coroutines.*
-import org.damienoreilly.threeutils.R
 import org.damienoreilly.threeutils.model.UsageDetails
 import org.damienoreilly.threeutils.repository.My3Repository
 import org.damienoreilly.threeutils.repository.PreferenceStorage
 import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.*
+import org.damienoreilly.threeutils.util.Utils.getDelay
 import org.damienoreilly.threeutils.util.Utils.parseDate
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneId
+import org.threeten.bp.Duration
 import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 
 
 class My3Worker(
@@ -48,17 +45,21 @@ class My3Worker(
     private fun setUpNotificationIfNeeded(usageDetails: UsageDetails) {
         usageDetails.text
                 ?.filter { it.name in internets }
-                ?.map { parseDate(it.expiryText) }
+                ?.mapNotNull { parseDate(it.expiryText) }
                 ?.maxWith(ZonedDateTime.timeLineOrder())
-                .also {
-                    Log.d("My3", it.toString())
-//                    Notify.with(applicationContext)
-//                            .content {
-//                                title = applicationContext.getString(R.string.internet_expire_short)
-//                                text = "${applicationContext.getString(R.string.internet_expire)} $it"
-//                            }
-//                            .show()
-                }
+                ?.let { setupInternetExpiringWorker(it) }
+    }
+
+    private fun setupInternetExpiringWorker(expireDate: ZonedDateTime) {
+        val work = OneTimeWorkRequestBuilder<InternetExpiringWorker>()
+                .setInitialDelay(getDelay(expireDate,
+                        ZonedDateTime.now(), Duration.ofHours(4))
+                        .toMillis(), TimeUnit.MILLISECONDS) // 🤢
+                .build()
+
+        WorkManager.getInstance()
+                .enqueueUniqueWork("my3_internet_expiring",
+                        ExistingWorkPolicy.KEEP, work)
     }
 
     private fun logError(login: Error) {
@@ -66,7 +67,7 @@ class My3Worker(
     }
 
     companion object {
-        val internets = setOf("Unlimited Data in Republic of Ireland", "Internet in Republic of Ireland & EU")
+        val internets = setOf("Unlimited Data in Republic of Ireland")// TODO: consider "Internet in Republic of Ireland & EU" ?
     }
 
 }
