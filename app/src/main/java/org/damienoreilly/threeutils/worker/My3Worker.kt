@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import kotlinx.coroutines.*
+import org.damienoreilly.threeutils.model.Usage
 import org.damienoreilly.threeutils.model.UsageDetails
 import org.damienoreilly.threeutils.repository.My3Repository
 import org.damienoreilly.threeutils.repository.PreferenceStorage
@@ -32,7 +33,7 @@ class My3Worker(
                         when (val usageDetails = my3Repository.getUsageDetails(
                                 login.data.token?.accessToken!!, preferenceStorage.my3UserName!!)) {
                             is Success -> setUpNotificationIfNeeded(usageDetails.data)
-                            is Error -> logError(usageDetails)
+                            is Error   -> logError(usageDetails)
                         }
                     }
                     is Error -> logError(login)
@@ -51,10 +52,14 @@ class My3Worker(
     }
 
     private fun setupInternetExpiringWorker(expireDate: ZonedDateTime) {
+        // 🤢
+        val delay = getDelay(expireDate, ZonedDateTime.now(), Duration.ofHours(4))
+                .toMillis()
+
+        Log.w("My3", "Delay set to $delay")
+
         val work = OneTimeWorkRequestBuilder<InternetExpiringWorker>()
-                .setInitialDelay(getDelay(expireDate,
-                        ZonedDateTime.now(), Duration.ofHours(4))
-                        .toMillis(), TimeUnit.MILLISECONDS) // 🤢
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build()
 
         WorkManager.getInstance()
