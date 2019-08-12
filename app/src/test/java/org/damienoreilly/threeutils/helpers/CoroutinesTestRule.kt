@@ -1,27 +1,29 @@
-package org.damienoreilly.threeutils
+package org.damienoreilly.threeutils.helpers
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
-import java.util.concurrent.Executors
 
+/**
+ * https://gist.github.com/manuelvicnt/049ce057fa6b5e5c785ec9fff7c22a7c#file-coroutinestestrule-kt
+ */
 @ExperimentalCoroutinesApi
-class CoroutinesMainDispatcherRule : TestWatcher() {
-
-    private val singleThreadExecutor = Executors.newSingleThreadExecutor()
+class CoroutinesTestRule(
+        private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+) : TestWatcher() {
 
     override fun starting(description: Description?) {
         super.starting(description)
-        Dispatchers.setMain(singleThreadExecutor.asCoroutineDispatcher())
+        Dispatchers.setMain(testDispatcher)
     }
 
     override fun finished(description: Description?) {
         super.finished(description)
-        singleThreadExecutor.shutdownNow()
         Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
     }
 }

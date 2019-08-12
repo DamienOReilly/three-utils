@@ -6,15 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import kotlinx.coroutines.launch
-import org.damienoreilly.threeutils.repository.PreferenceStorage
 import org.damienoreilly.threeutils.repository.My3Repository
+import org.damienoreilly.threeutils.repository.PreferenceStorage
+import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Error
+import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Success
 import org.damienoreilly.threeutils.worker.My3Worker
-import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.*
 import java.util.concurrent.TimeUnit
 
-class My3SetupViewModel (
+class My3SetupViewModel(
         private val preferenceStorage: PreferenceStorage,
-        private val my3Repository: My3Repository
+        private val my3Repository: My3Repository,
+        private val workManager: WorkManager
 ) : ViewModel() {
 
     val username = MutableLiveData<String>()
@@ -29,7 +31,7 @@ class My3SetupViewModel (
                 try {
                     when (val login = my3Repository.login(username.value!!, password.value!!)) {
                         is Success -> saveCredentialsAndSetupWorker(username.value!!, password.value!!)
-                        is Error   -> loginError.postValue(login.error.toString())
+                        is Error -> loginError.postValue(login.error.toString())
                     }
                 } catch (e: Exception) {
                     loginError.postValue("Error connecting to My3.")
@@ -54,8 +56,7 @@ class My3SetupViewModel (
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.MINUTES)
                 .build()
 
-        WorkManager.getInstance()
-                .enqueueUniquePeriodicWork("my3_usage_refresh",
+        workManager.enqueueUniquePeriodicWork("my3_usage_refresh",
                         ExistingPeriodicWorkPolicy.KEEP, work)
     }
 

@@ -1,19 +1,13 @@
 package org.damienoreilly.threeutils.di
 
+import androidx.work.WorkManager
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.damienoreilly.threeutils.BuildConfig
 import org.damienoreilly.threeutils.di.RetroFitClient.createApiService
 import org.damienoreilly.threeutils.di.RetroFitClient.provideOkHttpClient
-import org.damienoreilly.threeutils.repository.My3API
-import org.damienoreilly.threeutils.repository.PreferenceStorage
-import org.damienoreilly.threeutils.repository.SharedPreferenceStorage
-import org.damienoreilly.threeutils.repository.ThreePlusAPI
-import org.damienoreilly.threeutils.repository.My3Repository
-import org.damienoreilly.threeutils.repository.My3RepositoryImpl
-import org.damienoreilly.threeutils.repository.ThreePlusRepository
-import org.damienoreilly.threeutils.repository.ThreePlusRepositoryImpl
+import org.damienoreilly.threeutils.repository.*
 import org.damienoreilly.threeutils.viewmodel.My3SetupViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -33,15 +27,18 @@ val appModule = module {
     single<PreferenceStorage> { SharedPreferenceStorage(get()) }
     single<My3Repository> { My3RepositoryImpl(get()) }
     single<ThreePlusRepository> { ThreePlusRepositoryImpl(get()) }
-    viewModel { My3SetupViewModel(get(), get()) }
+    single { WorkManager.getInstance(get()) }
+    viewModel { My3SetupViewModel(get(), get(), get()) }
 }
 
 object RetroFitClient {
     private val loggingLevel = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-    private val logging = HttpLoggingInterceptor().setLevel(loggingLevel)
+    private val logging = HttpLoggingInterceptor()
+
     private val duration = Duration.of(30, ChronoUnit.SECONDS)
 
     fun provideOkHttpClient(): OkHttpClient {
+        logging.level = loggingLevel
         return OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .connectTimeout(duration.seconds, TimeUnit.SECONDS)

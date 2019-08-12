@@ -2,7 +2,7 @@ package org.damienoreilly.threeutils.worker
 
 import android.content.Context
 import android.util.Log
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
 import org.damienoreilly.threeutils.model.EnterCompetition
@@ -13,9 +13,9 @@ import org.koin.core.inject
 
 class ThreePlusWorker(
         context: Context, workerParams: WorkerParameters
-) : Worker(context, workerParams), KoinComponent {
+) : CoroutineWorker(context, workerParams), KoinComponent {
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result = coroutineScope {
 
         val threePlusRepository: ThreePlusRepository by inject()
 
@@ -25,7 +25,6 @@ class ThreePlusWorker(
         val password = prefs.getString("password", null)
 
         if (username != null && password != null) {
-            runBlocking {
                 when (val login = threePlusRepository.login(username, password)) {
                     is Success -> {
                         when (val comps = threePlusRepository.getCompetitions(login.data.access_token)) {
@@ -44,8 +43,7 @@ class ThreePlusWorker(
                     is Error -> logError(login)
                 }
             }
-        }
-        return Result.success()
+        Result.success()
     }
 
     private fun logError(comps: Error) {

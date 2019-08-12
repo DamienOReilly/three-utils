@@ -62,7 +62,7 @@ class My3Worker(
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build()
 
-        WorkManager.getInstance()
+        WorkManager.getInstance(applicationContext)
                 .enqueueUniqueWork("my3_internet_expiring",
                         ExistingWorkPolicy.KEEP, work)
     }

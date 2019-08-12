@@ -19,7 +19,7 @@ class My3Application : Application() {
             androidLogger()
             androidContext(this@My3Application)
             androidFileProperties()
-            modules(appModule, networkModule)
+            modules(listOf(appModule, networkModule))
         }
 
     }
