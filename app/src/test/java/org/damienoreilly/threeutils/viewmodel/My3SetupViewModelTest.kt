@@ -9,12 +9,12 @@ import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.damienoreilly.threeutils.helpers.CoroutinesTestRule
 import org.damienoreilly.threeutils.helpers.FakePreferenceStorage
+import org.damienoreilly.threeutils.model.My3Error
 import org.damienoreilly.threeutils.model.My3Token
 import org.damienoreilly.threeutils.model.Profile
 import org.damienoreilly.threeutils.model.TokenInfo
 import org.damienoreilly.threeutils.repository.My3Repository
 import org.damienoreilly.threeutils.repository.ThreeUtilsService
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
@@ -32,12 +32,8 @@ class My3SetupViewModelTest : TestWatcher() {
     @get:Rule
     var coroutinesMainDispatcherRule = CoroutinesTestRule()
 
-    @Before
-    fun setUp() {
-    }
-
     @Test
-    fun my3SetupViewModelTest() {
+    fun my3SetupViewModelTest_savesCredentialsAndSetupsJob() {
 
         val userName = "0830000000"
         val password = "testpass"
@@ -45,12 +41,15 @@ class My3SetupViewModelTest : TestWatcher() {
         val token = My3Token(TokenInfo("", ""), Profile("", emptyList(), "", ""))
 
         val my3Repository = mock<My3Repository> {
-            onBlocking { login(anyString(), anyString()) } doReturn ThreeUtilsService.Response.Success(token)
+            onBlocking {
+                login(anyString(), anyString())
+            } doReturn ThreeUtilsService.Response.Success(token)
         }
 
         val workManager = mock<WorkManager> {
             on {
-                enqueueUniquePeriodicWork(eq("my3_usage_refresh"), eq(ExistingPeriodicWorkPolicy.KEEP), any())
+                enqueueUniquePeriodicWork(eq(My3SetupViewModel.MY3_USAGE_REFRESH_WORKER),
+                        eq(ExistingPeriodicWorkPolicy.KEEP), any())
             } doReturn OperationImpl()
         }
 
@@ -67,6 +66,37 @@ class My3SetupViewModelTest : TestWatcher() {
         assertThat(viewModel.loginError.value).isNull()
 
         verify(workManager, times(1))
-                .enqueueUniquePeriodicWork(eq("my3_usage_refresh"), eq(ExistingPeriodicWorkPolicy.KEEP), any())
+                .enqueueUniquePeriodicWork(eq(My3SetupViewModel.MY3_USAGE_REFRESH_WORKER),
+                        eq(ExistingPeriodicWorkPolicy.KEEP), any())
+    }
+
+    @Test
+    fun my3SetupViewModelTest_showsLoginError() {
+
+        val userName = "0830000000"
+        val password = "testpass"
+
+        val response = My3Error(errorCode = "Incorrect Login", errorDescription = "Bad Credentials",
+                errorNumber = 403, defaultUserMessage = null)
+
+        val my3Repository = mock<My3Repository> {
+            onBlocking {
+                login(anyString(), anyString())
+            } doReturn ThreeUtilsService.Response.Error(response)
+        }
+
+        val workManager = mock<WorkManager>()
+
+        val preferenceStorage = FakePreferenceStorage()
+
+        val viewModel = My3SetupViewModel(preferenceStorage, my3Repository, workManager)
+        viewModel.username.value = userName
+        viewModel.password.value = password
+
+        viewModel.validateCredentials()
+
+        assertThat(preferenceStorage.my3UserName).isEqualTo(null)
+        assertThat(preferenceStorage.my3Password).isEqualTo(null)
+        assertThat(viewModel.loginError.value).isEqualTo("Bad Credentials")
     }
 }

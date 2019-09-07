@@ -56,9 +56,12 @@ class My3SetupViewModel(
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.MINUTES)
                 .build()
 
-        workManager.enqueueUniquePeriodicWork("my3_usage_refresh",
+        workManager.enqueueUniquePeriodicWork(MY3_USAGE_REFRESH_WORKER,
                         ExistingPeriodicWorkPolicy.KEEP, work)
     }
 
+    companion object {
+        const val MY3_USAGE_REFRESH_WORKER = "my3_usage_refresh_worker"
+    }
 
 }

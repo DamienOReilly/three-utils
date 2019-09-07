@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import kotlinx.coroutines.*
-import org.damienoreilly.threeutils.model.Usage
 import org.damienoreilly.threeutils.model.UsageDetails
 import org.damienoreilly.threeutils.repository.My3Repository
 import org.damienoreilly.threeutils.repository.PreferenceStorage
@@ -53,7 +52,7 @@ class My3Worker(
 
     private fun setupInternetExpiringWorker(expireDate: ZonedDateTime) {
         // 🤢
-        val delay = getDelay(expireDate, ZonedDateTime.now(), Duration.ofHours(4))
+        val delay = getDelay(expireDate, ZonedDateTime.now(), Duration.ofHours(4)) //FIXME: make configurable
                 .toMillis()
 
         Log.w("My3", "Delay set to $delay")
@@ -63,7 +62,7 @@ class My3Worker(
                 .build()
 
         WorkManager.getInstance(applicationContext)
-                .enqueueUniqueWork("my3_internet_expiring",
+                .enqueueUniqueWork(MY3_INTERNET_EXPIRING_WORKER,
                         ExistingWorkPolicy.KEEP, work)
     }
 
@@ -73,6 +72,8 @@ class My3Worker(
 
     companion object {
         val internets = setOf("Unlimited Data in Republic of Ireland")// TODO: consider "Internet in Republic of Ireland & EU" ?
+
+        const val MY3_INTERNET_EXPIRING_WORKER = "my3_internet_expiring_worker"
     }
 
 }
