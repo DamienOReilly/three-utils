@@ -19,7 +19,7 @@ interface PreferenceStorage {
     var my3Password: String?
 }
 
-class SharedPreferenceStorage (context: Context) :
+class SharedPreferenceStorage(context: Context) :
         PreferenceStorage {
 
     private val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)

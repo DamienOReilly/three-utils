@@ -2,7 +2,7 @@ package org.damienoreilly.threeutils.repository
 
 import com.squareup.moshi.JsonAdapter
 import org.damienoreilly.threeutils.model.*
-import org.damienoreilly.threeutils.repository.ThreeUtilsService.*
+import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response
 
 
 interface My3Repository {

@@ -20,4 +20,7 @@ class InternetExpiringWorker(
         return Result.success()
     }
 
+    companion object {
+        const val MY3_INTERNET_EXPIRING_WORKER = "my3_internet_expiring_worker"
+    }
 }

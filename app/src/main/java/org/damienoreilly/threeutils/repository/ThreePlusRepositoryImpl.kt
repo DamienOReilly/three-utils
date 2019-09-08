@@ -2,10 +2,10 @@ package org.damienoreilly.threeutils.repository
 
 import com.squareup.moshi.JsonAdapter
 import org.damienoreilly.threeutils.model.*
-import org.damienoreilly.threeutils.repository.ThreeUtilsService.*
+import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response
 
 
-interface ThreePlusRepository: ThreeUtilsService {
+interface ThreePlusRepository : ThreeUtilsService {
     suspend fun login(username: String, password: String): Response<ThreePlusToken>
     suspend fun getCompetitions(token: String): Response<List<Competitions>>
     suspend fun enterCompetition(token: String, offer: Number, comp: EnterCompetition): Response<CompetitionEntered>

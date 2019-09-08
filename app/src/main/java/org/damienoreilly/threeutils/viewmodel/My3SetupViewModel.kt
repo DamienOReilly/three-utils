@@ -11,6 +11,7 @@ import org.damienoreilly.threeutils.repository.PreferenceStorage
 import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Error
 import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Success
 import org.damienoreilly.threeutils.worker.My3Worker
+import org.damienoreilly.threeutils.worker.My3Worker.Companion.MY3_USAGE_REFRESH_WORKER
 import java.util.concurrent.TimeUnit
 
 class My3SetupViewModel(
@@ -57,11 +58,7 @@ class My3SetupViewModel(
                 .build()
 
         workManager.enqueueUniquePeriodicWork(MY3_USAGE_REFRESH_WORKER,
-                        ExistingPeriodicWorkPolicy.KEEP, work)
-    }
-
-    companion object {
-        const val MY3_USAGE_REFRESH_WORKER = "my3_usage_refresh_worker"
+                ExistingPeriodicWorkPolicy.KEEP, work)
     }
 
 }

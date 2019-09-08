@@ -7,8 +7,10 @@
     <string name="action_save">Save</string>
     <string name="error_field_required">This field is required</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="internet_expire_short">Internet expiring!</string>
     <string name="internet_expire">Your internet add-on is due to expire tonight.</string>
+
+    <string name="my3_incorrect_credentials_short">Invalid username or password!</string>
+    <string name="my3_incorrect_credentials">Your username or password is incorrect, disabling Three-Utils until you update.</string>
 </resources>

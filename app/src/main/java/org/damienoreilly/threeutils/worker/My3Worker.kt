@@ -3,13 +3,18 @@ package org.damienoreilly.threeutils.worker
 import android.content.Context
 import android.util.Log
 import androidx.work.*
-import kotlinx.coroutines.*
+import io.karn.notify.Notify
+import kotlinx.coroutines.runBlocking
+import org.damienoreilly.threeutils.R
+import org.damienoreilly.threeutils.model.My3Error
 import org.damienoreilly.threeutils.model.UsageDetails
 import org.damienoreilly.threeutils.repository.My3Repository
 import org.damienoreilly.threeutils.repository.PreferenceStorage
-import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.*
+import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Error
+import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Success
 import org.damienoreilly.threeutils.util.Utils.getDelay
 import org.damienoreilly.threeutils.util.Utils.parseDate
+import org.damienoreilly.threeutils.worker.InternetExpiringWorker.Companion.MY3_INTERNET_EXPIRING_WORKER
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.threeten.bp.Duration
@@ -32,15 +37,36 @@ class My3Worker(
                         when (val usageDetails = my3Repository.getUsageDetails(
                                 login.data.token?.accessToken!!, preferenceStorage.my3UserName!!)) {
                             is Success -> setUpNotificationIfNeeded(usageDetails.data)
-                            is Error   -> logError(usageDetails)
+                            is Error -> logError(usageDetails)
                         }
                     }
-                    is Error -> logError(login)
+                    is Error -> {
+                        when (login.error) {
+                            is My3Error -> {
+                                if (login.error.toString().startsWith("Incorrect Username or Password.")) {
+                                    // Disable periodically refreshing to prevent account from been locked out.
+                                    Notify.with(applicationContext)
+                                            .content {
+                                                title = applicationContext.getString(R.string.my3_incorrect_credentials_short)
+                                                text = applicationContext.getString(R.string.my3_incorrect_credentials)
+                                            }
+                                            .show()
+                                    disableMy3UsageRefreshWorker()
+                                } else logError(login)
+                            }
+                            else -> logError(login)
+                        }
+                    }
                 }
             }
+        } else {
+            disableMy3UsageRefreshWorker()
         }
         return Result.success()
     }
+
+    private fun disableMy3UsageRefreshWorker() =
+            WorkManager.getInstance(applicationContext).cancelUniqueWork(MY3_USAGE_REFRESH_WORKER)
 
     private fun setUpNotificationIfNeeded(usageDetails: UsageDetails) {
         usageDetails.text
@@ -73,7 +99,7 @@ class My3Worker(
     companion object {
         val internets = setOf("Unlimited Data in Republic of Ireland")// TODO: consider "Internet in Republic of Ireland & EU" ?
 
-        const val MY3_INTERNET_EXPIRING_WORKER = "my3_internet_expiring_worker"
+        const val MY3_USAGE_REFRESH_WORKER = "my3_usage_refresh_worker"
     }
 
 }
