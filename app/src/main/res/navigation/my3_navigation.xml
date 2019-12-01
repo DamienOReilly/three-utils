@@ -3,19 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/my3Navigation"
-    app:startDestination="@+id/my3Usage">
+    app:startDestination="@+id/my3SetupFragment">
 
     <fragment
-        android:id="@+id/my3Setup"
+        android:id="@+id/my3SetupFragment"
         android:name="org.damienoreilly.threeutils.fragment.My3SetupFragment"
         android:label="fragment_my3_setup"
         tools:layout="@layout/fragment_my3_setup" >
+        <action
+            android:id="@+id/action_my3Setup_to_threePlusSetupFragment"
+            app:destination="@id/threePlusSetupFragment"
+            app:enterAnim="@anim/fragment_fade_enter" />
     </fragment>
     <fragment
-        android:id="@+id/my3Usage"
-        android:name="org.damienoreilly.threeutils.fragment.My3Usage"
-        android:label="fragment_my3_usage"
-        tools:layout="@layout/fragment_my3_usage" >
-        <action android:id="@+id/action_my3Usage_to_my3Setup" app:destination="@id/my3Setup" />
-    </fragment>
+        android:id="@+id/threePlusSetupFragment"
+        android:name="org.damienoreilly.threeutils.fragment.ThreePlusSetupFragment"
+        android:label="fragment_three_plus_setup"
+        tools:layout="@layout/fragment_three_plus_setup"/>
 </navigation>

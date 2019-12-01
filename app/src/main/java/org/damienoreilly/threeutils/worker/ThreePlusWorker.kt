@@ -3,11 +3,13 @@ package org.damienoreilly.threeutils.worker
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.damienoreilly.threeutils.model.EnterCompetition
+import org.damienoreilly.threeutils.repository.PreferenceStorage
 import org.damienoreilly.threeutils.repository.ThreePlusRepository
 import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Error
 import org.damienoreilly.threeutils.repository.ThreeUtilsService.Response.Success
@@ -21,14 +23,10 @@ class ThreePlusWorker(
     override suspend fun doWork(): Result = coroutineScope {
 
         val threePlusRepository: ThreePlusRepository by inject()
+        val preferenceStorage: PreferenceStorage by inject()
 
-        val prefs = applicationContext.getSharedPreferences("3plus",
-                Context.MODE_PRIVATE)
-        val username = prefs.getString("username", null)
-        val password = prefs.getString("password", null)
-
-        if (username != null && password != null) {
-            when (val login = threePlusRepository.login(username, password)) {
+        if (preferenceStorage.threePlusUserName != null && preferenceStorage.threePlusPassword != null) {
+            when (val login = threePlusRepository.login(preferenceStorage.threePlusUserName!!, preferenceStorage.threePlusPassword!!)) {
                 is Success -> {
                     when (val comps = threePlusRepository.getCompetitions(login.data.access_token)) {
                         is Success -> {
@@ -45,12 +43,21 @@ class ThreePlusWorker(
                 }
                 is Error -> logError(login)
             }
+        } else {
+            disableThreePlusWorker()
         }
         Result.success()
     }
 
+    private fun disableThreePlusWorker() =
+            WorkManager.getInstance(applicationContext).cancelUniqueWork(THREE_PLUS_WORKER)
+
     private fun logError(comps: Error) {
         Log.d("3Plus", comps.error.toString())
+    }
+
+    companion object {
+        const val THREE_PLUS_WORKER = "three_plus_worker"
     }
 
 }

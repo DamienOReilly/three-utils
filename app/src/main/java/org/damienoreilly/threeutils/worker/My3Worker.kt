@@ -37,7 +37,7 @@ class My3Worker(
                         when (val usageDetails = my3Repository.getUsageDetails(
                                 login.data.token?.accessToken!!, preferenceStorage.my3UserName!!)) {
                             is Success -> setUpNotificationIfNeeded(usageDetails.data)
-                            is Error -> logError(usageDetails)
+                            is Error   -> logError(usageDetails)
                         }
                     }
                     is Error -> {

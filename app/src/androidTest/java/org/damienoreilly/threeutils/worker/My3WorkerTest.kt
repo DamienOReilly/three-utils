@@ -84,7 +84,7 @@ class My3WorkerTest : KoinTest {
     }
 
     @Test
-    fun testMy3Worker_invalidCredentials() {
+    fun testMy3Worker_whenInvalidCredentials_jobIsUnScheduled() {
 
         val error = My3Error(
                 errorCode = "invalid_credentials",

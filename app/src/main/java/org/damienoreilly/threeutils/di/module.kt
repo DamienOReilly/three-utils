@@ -9,6 +9,7 @@ import org.damienoreilly.threeutils.di.RetroFitClient.createApiService
 import org.damienoreilly.threeutils.di.RetroFitClient.provideOkHttpClient
 import org.damienoreilly.threeutils.repository.*
 import org.damienoreilly.threeutils.viewmodel.My3SetupViewModel
+import org.damienoreilly.threeutils.viewmodel.ThreePlusSetupViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import org.threeten.bp.Duration
@@ -29,6 +30,7 @@ val appModule = module {
     single<ThreePlusRepository> { ThreePlusRepositoryImpl(get()) }
     single { WorkManager.getInstance(get()) }
     viewModel { My3SetupViewModel(get(), get(), get()) }
+    viewModel { ThreePlusSetupViewModel(get(), get(), get()) }
 }
 
 object RetroFitClient {

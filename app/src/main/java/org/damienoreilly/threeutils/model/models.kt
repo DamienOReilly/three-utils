@@ -66,14 +66,14 @@ data class ThreePlusToken(val access_token: String,
                           val jti: String) : ApiResponse()
 
 @JsonClass(generateAdapter = true)
-data class Competitions(val id: Number,
+data class Competitions(val id: Int,
                         val category: String?,
                         val categorySecondary: String?,
                         val title: String?,
                         val subtitle: String?,
                         val type: String?,
-                        val index: Number?,
-                        val order: Number?,
+                        val index: Int?,
+                        val order: Int?,
                         val urlBannerImageLarge: String?,
                         val urlBannerImageLargeApp: String?,
                         val urlBannerImageMedium: String?,
@@ -90,8 +90,8 @@ data class Competitions(val id: Number,
                         val urlName: String?,
                         val countdownOffer: Boolean?,
                         val endDate: String?,
-                        val maxNbOfOffer: Number?,
-                        val remaining: Number?) : ApiResponse()
+                        val maxNbOfOffer: Int?,
+                        val remaining: Int?) : ApiResponse()
 
 @JsonClass(generateAdapter = true)
 data class EnterCompetition(
@@ -112,7 +112,7 @@ data class CompetitionEntered(
 data class ThreePlusRequestError(val error: String,
                                  val error_description: String) : ApiError() {
     override fun toString(): String {
-        return error
+        return error_description
     }
 }
 

@@ -15,6 +15,7 @@ import org.damienoreilly.threeutils.model.Profile
 import org.damienoreilly.threeutils.model.TokenInfo
 import org.damienoreilly.threeutils.repository.My3Repository
 import org.damienoreilly.threeutils.repository.ThreeUtilsService
+import org.damienoreilly.threeutils.worker.My3Worker
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
@@ -38,7 +39,8 @@ class My3SetupViewModelTest : TestWatcher() {
         val userName = "0830000000"
         val password = "testpass"
 
-        val token = My3Token(TokenInfo("", ""), Profile("", emptyList(), "", ""))
+        val token = My3Token(TokenInfo("", ""),
+                Profile("", emptyList(), "", ""))
 
         val my3Repository = mock<My3Repository> {
             onBlocking {
@@ -48,7 +50,7 @@ class My3SetupViewModelTest : TestWatcher() {
 
         val workManager = mock<WorkManager> {
             on {
-                enqueueUniquePeriodicWork(eq(My3SetupViewModel.MY3_USAGE_REFRESH_WORKER),
+                enqueueUniquePeriodicWork(eq(My3Worker.MY3_USAGE_REFRESH_WORKER),
                         eq(ExistingPeriodicWorkPolicy.KEEP), any())
             } doReturn OperationImpl()
         }
@@ -66,7 +68,7 @@ class My3SetupViewModelTest : TestWatcher() {
         assertThat(viewModel.loginError.value).isNull()
 
         verify(workManager, times(1))
-                .enqueueUniquePeriodicWork(eq(My3SetupViewModel.MY3_USAGE_REFRESH_WORKER),
+                .enqueueUniquePeriodicWork(eq(My3Worker.MY3_USAGE_REFRESH_WORKER),
                         eq(ExistingPeriodicWorkPolicy.KEEP), any())
     }
 
@@ -76,8 +78,10 @@ class My3SetupViewModelTest : TestWatcher() {
         val userName = "0830000000"
         val password = "testpass"
 
-        val response = My3Error(errorCode = "Incorrect Login", errorDescription = "Bad Credentials",
-                errorNumber = 403, defaultUserMessage = null)
+        val response = My3Error(errorCode = "Incorrect Login",
+                errorDescription = "Bad Credentials",
+                errorNumber = 403,
+                defaultUserMessage = null)
 
         val my3Repository = mock<My3Repository> {
             onBlocking {

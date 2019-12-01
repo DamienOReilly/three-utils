@@ -7,11 +7,11 @@
 
         <variable
             name="viewModel"
-            type="org.damienoreilly.threeutils.viewmodel.My3SetupViewModel" />
+            type="org.damienoreilly.threeutils.viewmodel.ThreePlusSetupViewModel" />
     </data>
 
     <LinearLayout
-        android:id="@+id/my3_login_form"
+        android:id="@+id/threeplus_login_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="username"
-                android:hint="@string/my3_prompt_username"
+                android:hint="@string/threeplus_prompt_username"
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"
@@ -53,7 +53,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/my3_save"
+            android:id="@+id/threeplus_save"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

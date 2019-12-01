@@ -17,6 +17,9 @@ interface PreferenceStorage {
     var alertInternetExpiring: Boolean
     var my3UserName: String?
     var my3Password: String?
+    var autoEnterCompetitions: Boolean
+    var threePlusUserName: String?
+    var threePlusPassword: String?
 }
 
 class SharedPreferenceStorage(context: Context) :
@@ -24,19 +27,27 @@ class SharedPreferenceStorage(context: Context) :
 
     private val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
-
     override var alertInternetExpiring by BooleanPreference(prefs, ALERT_INTERNET_EXPIRING, false)
 
     override var my3UserName by StringPreference(prefs, MY3_USERNAME, null)
 
     override var my3Password by StringPreference(prefs, MY3_PASSWORD, null)
 
+    override var autoEnterCompetitions by BooleanPreference(prefs, AUTO_ENTER_COMPETITIONS, false)
+
+    override var threePlusUserName by StringPreference(prefs, THREEPLUS_USERNAME, null)
+
+    override var threePlusPassword by StringPreference(prefs, THREEPLUS_PASSWORD, null)
+
 
     companion object {
-        const val PREFS_NAME = "3utils"
+        const val PREFS_NAME = "three-utils"
         const val ALERT_INTERNET_EXPIRING = "alert_internet_expiring"
         const val MY3_USERNAME = "my3_username"
         const val MY3_PASSWORD = "my3_password"
+        const val AUTO_ENTER_COMPETITIONS = "auto_enter_competitions"
+        const val THREEPLUS_USERNAME = "threeplus_username"
+        const val THREEPLUS_PASSWORD = "threeplus_password"
     }
 }
 
